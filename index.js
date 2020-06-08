@@ -62,6 +62,7 @@ const AXMA = {
     'Vick7': 'ViicAS',
     'xoxocould': 'Jfilho_AS',
     'andrehenrique_AS': 'andrehenriq_AS',
+    'fernandomarx': 'Fernandomarx_AS',
   },
   excludeTournaments: ['J2EGtXiN', 'oBRtdCrN', 'sGMpNkje'],
   excludeUsers: ['Seifador_de_Manoel', 'marshmall0ew', 'Nielison_AS', 'Pedro_AS'],
