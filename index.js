@@ -239,18 +239,28 @@ const app = async () => {
         }
       },0)
 
-      let medals = tournamentIds.reduce((medals, id) => {
+      let medals = tournamentIds.reduce((memo, id) => {
         if (tournamentData[id][user]) {
           const { rank } = tournamentData[id][user]
+          const medal = AXMA.medals[rank - 1]
 
-          if (AXMA.medals[rank - 1]) medals.push(AXMA.medals[rank - 1])
+          if (medal) {
+            if (!memo[medal]) memo[medal] = 0
+            memo[medal] += 1
+          }
         }
-        return medals
-      }, [])
 
-      
-      if (medals.length == 0) medals = ['-']
-      medals = medals.join(' ')
+        return memo
+      }, {})
+
+      if (medals === {}) {
+        medals = '-'
+      } else {
+        medals = AXMA.medals
+          .filter(m => medals[m])
+          .map(m => medals[m] == 1 ? m : `${m}(${medals[m]}x)`)
+          .join(' ')
+      }
 
       return [user, points, medals].join(',')
     }).join("\n")
