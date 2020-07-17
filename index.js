@@ -45,7 +45,7 @@ const cachedRequest = async (path, requestFunction) => {
 const AXMA = {
   points: [10, 8, 6, 3, 2],
   medals: ["🥇", "🥈", "🥉"],
-  user_maps: {
+  userMaps: {
     'Allan33a': 'allan_AS',
     'Drelielson': 'Drelielson_AS',
     'EduHnrq_AS': 'eduardohenrique_AS',
@@ -64,10 +64,22 @@ const AXMA = {
     'andrehenrique_AS': 'andrehenriq_AS',
     'fernandomarx': 'Fernandomarx_AS',
   },
-  excludeTournaments: ['J2EGtXiN', 'oBRtdCrN', 'sGMpNkje'],
+  excludeTournaments: ['J2EGtXiN', 'oBRtdCrN', 'sGMpNkje', 'fLK31eke'],
+  allowedTournamentCreators: [
+    'jfilho_as',
+    'lucasmax_as',
+    'eduhnrq_as',
+    'lucasmax',
+    'eduardohenrique_as'
+  ],
+  usersToFetch: [
+    "EduHnrq_AS",
+    "Jfilho_AS",
+    "eduardohenrique_AS",
+  ],
   excludeUsers: ['Seifador_de_Manoel', 'marshmall0ew', 'Nielison_AS', 'Pedro_AS'],
   getPoints: index => index >= AXMA.points.length ? 1 : AXMA.points[index],
-  normalizeUser: user => AXMA.user_maps[user] ? AXMA.user_maps[user] : user,
+  normalizeUser: user => AXMA.userMaps[user] ? AXMA.userMaps[user] : user,
   removeTournaments: tournamentIds => tournamentIds.filter(id => !AXMA.excludeTournaments.includes(id)),
   removeUsers: userIds => userIds.filter(id => !AXMA.excludeUsers.includes(id))
 }
@@ -187,16 +199,13 @@ const fetchTournaments = tournamentIds => recursive(tournamentIds, tournamentId 
 }))
 
 const app = async () => {
-  
-  const users = [
-    "EduHnrq_AS",
-    "Jfilho_AS",
-  ]
 
-  const gameIds = uniq((await fetchGames(users)).flat());
+  const gameIds = uniq((await fetchGames(AXMA.usersToFetch)).flat());
   let tournamentIds = uniq(present(await getTournamentIds(gameIds)))
   tournamentIds = AXMA.removeTournaments(tournamentIds);
-  tournamentIds = (await fetchTournaments(tournamentIds)).sort((t1, t2) => new Date(t1.startsAt) - new Date(t2.startsAt)).map(t => t.id)
+  tournamentIds = (await fetchTournaments(tournamentIds)).sort(
+    (t1, t2) => new Date(t1.startsAt) - new Date(t2.startsAt)
+  ).filter(t => AXMA.allowedTournamentCreators.includes(t.createdBy.toLowerCase())).map(t => t.id)
 
   console.log(
     (await fetchTournaments(tournamentIds)).map(t => `https://lichess.org/tournament/${t.id} - ${t.fullName}`).join("\n")
